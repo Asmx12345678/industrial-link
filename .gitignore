@@ -1,0 +1,10 @@
+build/
+.tools/
+data/
+*.log
+*.dylib
+*.so
+*.dll
+__pycache__/
+.pytest_cache/
+.DS_Store

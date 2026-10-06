@@ -1,0 +1,22 @@
+ARG IMAGE_PREFIX=
+FROM ${IMAGE_PREFIX}ubuntu:24.04 AS builder
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    build-essential cmake ca-certificates libsqlite3-dev && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
+COPY CMakeLists.txt ./
+COPY gateway gateway
+COPY plugins plugins
+RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DINDUSTRIAL_LINK_BUILD_QT_CLIENT=OFF \
+    && cmake --build build --parallel
+
+FROM ${IMAGE_PREFIX}ubuntu:24.04
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libsqlite3-0 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --create-home industrial && mkdir -p /app/data && chown -R industrial:industrial /app
+COPY --from=builder /src/build/industrial-gateway /app/industrial-gateway
+COPY --from=builder /src/build/libvendor_pipe.so /app/libvendor_pipe.so
+USER industrial
+WORKDIR /app
+EXPOSE 8080 9000 9001/udp
+ENTRYPOINT ["/app/industrial-gateway"]
+CMD ["--bind", "0.0.0.0", "--plugin", "/app/libvendor_pipe.so", "--event-log", "/app/data/events.jsonl"]

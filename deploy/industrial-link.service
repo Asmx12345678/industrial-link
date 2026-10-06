@@ -1,0 +1,29 @@
+[Unit]
+Description=IndustrialLink industrial communication gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=industrial-link
+Group=industrial-link
+WorkingDirectory=/opt/industrial-link
+ExecStart=/opt/industrial-link/bin/industrial-gateway \
+  --bind 0.0.0.0 \
+  --tcp-port 9000 \
+  --udp-port 9001 \
+  --http-port 8080 \
+  --plugin /opt/industrial-link/lib/libvendor_pipe.so \
+  --event-log /var/lib/industrial-link/events.jsonl
+Restart=on-failure
+RestartSec=2
+LimitNOFILE=65536
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/industrial-link
+
+[Install]
+WantedBy=multi-user.target
+

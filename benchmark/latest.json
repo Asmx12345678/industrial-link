@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-10-03T08:49:36.290488+00:00",
+  "environment": {
+    "platform": "macOS-26.7-arm64-arm-64bit",
+    "machine": "arm64",
+    "python": "3.9.6",
+    "cpu_count": 10
+  },
+  "configuration": {
+    "devices": 500,
+    "rate_per_device": 10.0,
+    "duration_seconds": 5.0
+  },
+  "wall_time_seconds": 5.148,
+  "simulator": {
+    "protocol": "tcp",
+    "devices": 500,
+    "duration_seconds": 5.084,
+    "sent": 24500,
+    "acknowledged": 24500,
+    "messages_per_second": 4819.09,
+    "ack_ratio": 1.0,
+    "reconnects": 0,
+    "failures": 0,
+    "latency_ms": {
+      "mean": 2.289,
+      "p50": 1.942,
+      "p95": 5.528,
+      "p99": 7.166
+    }
+  },
+  "gateway": {
+    "online_devices": 0,
+    "open_tcp_sessions": 0,
+    "accepted_connections": 500,
+    "closed_connections": 500,
+    "messages_received": 24500,
+    "bytes_received": 1204000,
+    "duplicate_messages": 0,
+    "malformed_messages": 0,
+    "commands_sent": 0,
+    "udp_messages": 0,
+    "alarms_triggered": 0,
+    "uptime_seconds": 5
+  }
+}

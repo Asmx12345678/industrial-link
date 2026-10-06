@@ -1,0 +1,15 @@
+{
+  "devices": [
+    {
+      "id": "plc-line-01",
+      "host": "modbus-simulator",
+      "port": 1502,
+      "unit": 1,
+      "start": 0,
+      "count": 4,
+      "interval": 1.0,
+      "register_names": ["temperature_x10", "voltage_x10", "speed_rpm", "state"]
+    }
+  ]
+}
+

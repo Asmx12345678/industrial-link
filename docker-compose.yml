@@ -1,0 +1,56 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.gateway
+      args:
+        IMAGE_PREFIX: ${DOCKER_IMAGE_PREFIX:-}
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+      - "9001:9001/udp"
+    volumes:
+      - gateway-data:/app/data
+    restart: unless-stopped
+
+  mqtt:
+    image: ${DOCKER_IMAGE_PREFIX:-}eclipse-mosquitto:2
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"
+    restart: unless-stopped
+
+  mqtt-bridge:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.python
+      args:
+        IMAGE_PREFIX: ${DOCKER_IMAGE_PREFIX:-}
+    working_dir: /app/adapters
+    command: ["python", "mqtt_bridge.py", "--gateway-host", "gateway", "--broker-host", "mqtt"]
+    depends_on: [gateway, mqtt]
+    restart: unless-stopped
+
+  modbus-simulator:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.python
+      args:
+        IMAGE_PREFIX: ${DOCKER_IMAGE_PREFIX:-}
+    command: ["python", "simulator/modbus_server.py", "--host", "0.0.0.0", "--port", "1502"]
+    restart: unless-stopped
+
+  modbus-bridge:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.python
+      args:
+        IMAGE_PREFIX: ${DOCKER_IMAGE_PREFIX:-}
+    working_dir: /app/adapters
+    command: ["python", "modbus_bridge.py", "--gateway-host", "gateway", "--config", "/app/config/modbus_devices.docker.json"]
+    depends_on: [gateway, modbus-simulator]
+    restart: unless-stopped
+
+volumes:
+  gateway-data:
